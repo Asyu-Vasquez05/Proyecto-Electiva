@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# VS Code
+.vscode/
+
+# Local databases (se regeneran si no existen)
+usuarios.json
+inventario.json
