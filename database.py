@@ -1,44 +1,46 @@
 import json
 import os
+from models import Usuario, Producto
 
-# Nombres de archivos
 USUARIOS_FILE = "usuarios.json"
 INVENTARIO_FILE = "inventario.json"
 
-def inicializar_archivos():
-    """Crea los archivos JSON si no existen con datos iniciales."""
+def cargar_usuarios():
+    """Carga la lista de usuarios desde el archivo JSON."""
     if not os.path.exists(USUARIOS_FILE):
-        # Usuario admin por defecto (password: admin)
-        data = [
-            {
-                "username": "admin",
-                "password_hash": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
-                "role": "admin"
-            }
-        ]
-        guardar_datos(USUARIOS_FILE, data)
-        print(f"Archivo {USUARIOS_FILE} creado con usuario admin por defecto.")
+        return []
+    try:
+        with open(USUARIOS_FILE, 'r') as f:
+            data = json.load(f)
+            return [Usuario.from_dict(u) for u in data]
+    except (json.JSONDecodeError, FileNotFoundError):
+        return []
 
+def guardar_usuarios(usuarios):
+    """Guarda la lista de usuarios en el archivo JSON."""
+    with open(USUARIOS_FILE, 'w') as f:
+        json.dump([u.to_dict() for u in usuarios], f, indent=4)
+
+def cargar_inventario():
+    """Carga el inventario desde el archivo JSON."""
     if not os.path.exists(INVENTARIO_FILE):
-        guardar_datos(INVENTARIO_FILE, [])
-        print(f"Archivo {INVENTARIO_FILE} creado vacío.")
-
-def cargar_datos(archivo):
-    """Carga datos desde un archivo JSON."""
-    try:
-        with open(archivo, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
         return []
-    except json.JSONDecodeError:
+    try:
+        with open(INVENTARIO_FILE, 'r') as f:
+            data = json.load(f)
+            return [Producto.from_dict(p) for p in data]
+    except (json.JSONDecodeError, FileNotFoundError):
         return []
 
-def guardar_datos(archivo, datos):
-    """Guarda datos en un archivo JSON."""
-    try:
-        with open(archivo, "w", encoding="utf-8") as f:
-            json.dump(datos, f, indent=4)
-        return True
-    except Exception as e:
-        print(f"Error guardando {archivo}: {e}")
-        return False
+def guardar_inventario(inventario):
+    """Guarda el inventario en el archivo JSON."""
+    with open(INVENTARIO_FILE, 'w') as f:
+        json.dump([p.to_dict() for p in inventario], f, indent=4)
+
+def inicializar_datos():
+    """Crea datos iniciales si los archivos no existen."""
+    if not os.path.exists(USUARIOS_FILE):
+        # Crear usuario admin por defecto
+        admin = Usuario(1, "admin", "admin123", "Admin")
+        guardar_usuarios([admin])
+        print("Usuario 'admin' creado por defecto (password: admin123).")
